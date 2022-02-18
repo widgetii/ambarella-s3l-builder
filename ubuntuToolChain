@@ -1,0 +1,35 @@
+#!/bin/sh
+TOOLCHAIN_VERSION=2015.11
+TOOLCHAIN_NAME=linaro-armv7ahf-${TOOLCHAIN_VERSION}-gcc5.2
+if [ -z $(which apt-get) ]; then
+	echo "Can't find apt, Ubuntu only"
+	exit 1
+fi
+
+ apt-get install -y \
+  git-core gnupg flex bison gperf build-essential zip curl \
+  zlib1g-dev wget mtd-tools fakeroot cramfsprogs genext2fs \
+  gawk subversion git-gui gitk unixodbc texinfo gcc-multilib \
+  g++-multilib cppcheck libxml2-dev doxygen graphviz perl ghostscript
+
+if [ "$(uname -m)" != "x86_64" ]; then
+	echo "Error! ToolChain ${TOOLCHAIN_VERSION} only support x86_64!"
+else
+	 apt-get install -y libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32readline6-dev lib32z1-dev
+fi
+
+ARM_TOOLCHAIN_PREFIX=/usr/local
+INSTALL_WITH_SUDO=yes
+LINARO_TOOLCHAIN=./${TOOLCHAIN_NAME}-x86_64.tar.xz
+
+mkdir -p $ARM_TOOLCHAIN_PREFIX/bin/
+if [ -r $LINARO_TOOLCHAIN ]; then
+		 tar Jxvf $LINARO_TOOLCHAIN -C $ARM_TOOLCHAIN_PREFIX
+else
+		echo "$LINARO_TOOLCHAIN does not exist!"
+		exit 1
+fi
+
+#gcc -o makedevs/makedevs -O3 -Wall makedevs/makedevs.c
+#chmod 755 makedevs/makedevs
+#mv makedevs/makedevs $ARM_TOOLCHAIN_PREFIX/bin/makedevs
